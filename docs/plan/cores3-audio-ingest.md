@@ -52,7 +52,7 @@ count, and duration.
   boundaries, early disconnect, invalid size, and idle and total deadlines.
   Return PCM to the caller only after a complete, valid upload.
 - Proposed commit — `feat: validate streamed cores3 pcm`
-- Status — Implemented; frozen for independent review.
+- Status — Complete; independent review passed. Commit `2aacc92`.
 
 #### T1.2. Save completed PCM as WAV
 
@@ -64,7 +64,7 @@ count, and duration.
   bytes. Verify that a write failure leaves neither a published recording
   nor a temporary file.
 - Proposed commit — `feat: save completed cores3 audio as wav`
-- Status — Planned.
+- Status — Implemented; frozen for independent review.
 
 #### T1.3. Wire the firmware endpoint to capture storage
 
@@ -105,5 +105,14 @@ count, and duration.
   RED: `uv run python -m unittest discover -s tests -p test_audio_receiver.py -v`
   exited 1 before the receiver existed. GREEN: the same command passed all
   15 focused tests, including size boundaries and deterministic deadline cases.
-  Commit and independent review are pending.
-- T1.2 and T1.3 implementation and end-to-end verification are pending.
+  Independent review passed; committed as `2aacc92`.
+- T1.2 — Added a synchronous writer that creates its explicit capture directory
+  and closes the WAV and file before atomic hard-link publication. Existing
+  recordings are never replaced; a destination collision fails and cleans up.
+  RED: `uv run python -m unittest discover -s tests -p test_audio_capture.py -v`
+  exited 1 because the writer module did not exist. GREEN: the same command
+  passed all 7 tests covering exact WAV content/format, unique captures, no
+  overwrite, write/close failures, and publication timing/failure cleanup.
+  Regression: `uv run python -m unittest discover -s tests -v` passed 22 tests;
+  `git diff --check` exited 0. Independent review and commit are pending.
+- T1.3 implementation and end-to-end verification are pending.
