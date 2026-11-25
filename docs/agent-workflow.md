@@ -7,7 +7,7 @@ planning, exploration, and other non-code requests stay in the main session.
 
 ## Before starting
 
-Before decomposing a task, starting developer/reviewer workers, or editing files,
+Before planning the work, starting developer/reviewer workers, or editing files,
 the implementer runs:
 
 ```sh
@@ -33,11 +33,10 @@ do not apply to edits made during an already-started normal task.
 
 Before editing files or starting developer/reviewer workers, the main session
 publishes an ordered task and commit plan based on the user's request and
-accepted requirements. Each task entry names its task ID, concrete outcome and
-scope, dependencies, acceptance criteria and expected checks, and proposed
-Conventional Commit. Keep the plan lightweight and focused on the requested
-work; do not add product scope or detail future tasks beyond what is needed to
-show dependencies and sequence.
+accepted requirements. Use [the plan template](plan/template.md) to describe
+each task's outcome and acceptance criteria and list its commit chunks in
+order. Each chunk names its ID, scope, dependencies, checks, and proposed
+Conventional Commit. Keep the plan focused on the requested work.
 
 Each implementation plan must focus on one specific outcome. During planning,
 use a rough judgment of total added and deleted lines across all its tasks,
@@ -47,29 +46,24 @@ response before implementation. This is a planning guardrail, not a hard
 implementation limit. Assess the whole plan, even when divided into tasks or
 commits, and defer unrelated changes to separate plans.
 
-Substantive change requests must be divided into multiple cohesive, independently
-reviewable tasks. Use a single task only when the work is genuinely small and
-indivisible, and state the specific reason in the plan. Do not split work by
-arbitrary file or layer boundaries, or separate tests from the implementation
-they verify just to increase the task count. Include the tests and documentation
-needed to make each task coherent and verifiable.
+Split a task into commit chunks where each chunk makes a coherent, reviewable
+change. Use a single chunk when the changes make more sense together. Include
+related tests and documentation with the changes they cover.
 
-Complete each planned task, its independent review, and its commit before
-starting the next task. Keep task commits separate; do not squash them into a
-final catch-all commit unless the user explicitly requests it. If discovery
-requires a scope or dependency change, revise and publish the remaining plan
-before doing the changed work. At completion, report the ordered task-to-commit
-mapping.
+Complete each chunk, its independent review, and its commit before starting the
+next. Keep those commits separate unless the user requests a squash. If
+discovery changes scope or dependencies, revise and publish the remaining
+plan before doing the changed work. At completion, report the commit hashes
+in chunk order.
 
-## One task at a time
+## One commit chunk at a time
 
-Work serially in the same checkout. For each distinct task, start a fresh
+Work serially in the same checkout. For each chunk, start a fresh
 `developer` and independent `code_reviewer` pair with `fork_turns=none`; give
-the reviewer a curated brief containing the task requirements and acceptance
+the reviewer a curated brief containing the chunk requirements and acceptance
 criteria, baseline, candidate scope, and validation evidence. Reuse that pair
-for corrections to that task. Children must not delegate or start nested
-agents. Do not begin the next task until this task has passed review and its
-commit is complete.
+for corrections to that chunk. Children must not delegate or start nested
+agents.
 
 ### Model and reasoning selection
 
@@ -99,7 +93,7 @@ model. Configuration edits do not change already-running agents. Check the live
 role definitions before spawning; if they still show old pins, refresh or reload
 the project before relying on the new settings.
 
-The implementer provides a task ID, baseline, requirements and acceptance
+The implementer provides a chunk ID, baseline, requirements and acceptance
 criteria, file ownership, dependencies, relevant earlier context, and expected
 checks before making changes. For code, use test-first development: demonstrate
 a meaningful failing test before production edits, then pass it with the
@@ -117,24 +111,24 @@ with specific findings and evidence.
 
 ## Review limit and commit
 
-Each task has three review rounds total: one initial review and at most two
+Each chunk has three review rounds total: one initial review and at most two
 re-reviews. Increment the round whenever a review is dispatched, including a
 review that returns `BLOCKED`. The implementer tracks the round and the
 reviewer confirms it.
 Corrections reuse the same pair. If the third review does not pass, stop the
 entire workflow: make no further fixes or commits, and do not start another
-task. Report unresolved findings, attempted corrections, checks, and the
+chunk. Report unresolved findings, attempted corrections, checks, and the
 decisions or input needed from the user; preserve the working changes. An
-explicit user request to retry that same task starts a new three-round budget
-and carries forward the unresolved findings. Renaming the task or replacing
+explicit user request to retry that same chunk starts a new three-round budget
+and carries forward the unresolved findings. Renaming the chunk or replacing
 the reviewer does not reset the budget. Escalate blockers as soon as they
 prevent safe progress.
 
 After `PASS` and successful required checks, only the implementer stages the
-exact files owned by that task and makes one Conventional Commit. Never push.
-Before starting another task, confirm the expected clean state and check for
+changes for that chunk and makes one Conventional Commit. Never push.
+Before starting another chunk, confirm the expected clean state and check for
 unexpected external changes; do not overwrite another person's edits. At the
-end, report task commits, validation, and limitations, and run appropriate
+end, report the commits, validation, and limitations, and run appropriate
 integration checks. Update the README or API documentation when completed work
 changes the gateway's supported behavior.
 

@@ -5,10 +5,10 @@
 - `docs/plan/<task>.md`: lightweight requirements, design decisions, and
   ordered implementation tasks for current work.
 
-Document each implementation plan in a Markdown file under `docs/plan/` during
-planning, before implementation begins. Use a descriptive, lowercase,
-hyphenated filename. Update the same file as decisions, scope, or task status
-change; keep detailed requirements there instead of duplicating them elsewhere.
+Start each implementation plan from [the plan template](docs/plan/template.md)
+before implementation begins. Save it under `docs/plan/` with a descriptive,
+lowercase, hyphenated filename. Update the same file as decisions, scope, or
+task status change. Keep detailed requirements in the plan.
 
 ## Workflow
 
@@ -21,11 +21,8 @@ change; keep detailed requirements there instead of duplicating them elsewhere.
 For code-change requests, the main session routes implementation to the
 configured `implementer` agent by default and passes along user requirements
 and decisions. Planning and exploration remain in the main session. Before
-workers start, the main session publishes an ordered task and commit plan.
-Split substantive requests into cohesive reviewable tasks; use one task only
-when the work is genuinely small and indivisible, and state why. Complete each
-task's review and commit before starting the next, keeping task commits
-separate. Follow [docs/agent-workflow.md](docs/agent-workflow.md) for startup
+workers start, the main session publishes the plan's ordered commit sequence.
+Follow [docs/agent-workflow.md](docs/agent-workflow.md) for startup
 checks, review protocol, and commit rules. If a configured role is unavailable,
 report that and stop; do not silently fall back to another role or model.
 
