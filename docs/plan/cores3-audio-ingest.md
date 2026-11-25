@@ -64,7 +64,7 @@ count, and duration.
   bytes. Verify that a write failure leaves neither a published recording
   nor a temporary file.
 - Proposed commit — `feat: save completed cores3 audio as wav`
-- Status — Implemented; frozen for independent review.
+- Status — Complete; independent review passed. Commit `9ac6547`.
 
 #### T1.3. Wire the firmware endpoint to capture storage
 
@@ -77,7 +77,7 @@ count, and duration.
   unsupported media is rejected, and a failed or interrupted request leaves
   no capture and frees the upload slot. Run the HTTP checks below.
 - Proposed commit — `feat: expose cores3 audio capture endpoint`
-- Status — Planned.
+- Status — Complete; independent review passed. Commit subject: feat: expose cores3 audio capture endpoint.
 
 ## End-to-end verification
 
@@ -114,5 +114,20 @@ count, and duration.
   passed all 7 tests covering exact WAV content/format, unique captures, no
   overwrite, write/close failures, and publication timing/failure cleanup.
   Regression: `uv run python -m unittest discover -s tests -v` passed 22 tests;
-  `git diff --check` exited 0. Independent review and commit are pending.
-- T1.3 implementation and end-to-end verification are pending.
+  `git diff --check` exited 0. Independent review passed; committed as `9ac6547`.
+- T1.3 — Added the capture endpoint, opt-in `STACKCHAN_CAPTURE_DIR`, one-upload
+  admission, error mapping, and request-associated capture logging. Finalization
+  is synchronous; validation, disconnect, cancellation, and storage failures
+  release admission. README documents configuration and the device check.
+  RED: `uv run python -m unittest discover -s tests -p 'test_transcriptions*.py' -v`
+  exited 1 because the app factory did not exist. GREEN: the same command
+  passed all 10 endpoint and real Uvicorn/socket tests. They verify exact
+  acknowledgment headers/body, arbitrary chunk and socket write boundaries,
+  no acknowledgment or file before the final chunk, and exact WAV format/PCM.
+  Missing final chunks, empty/short/odd bodies, oversize before completion,
+  and stalled uploads leave no files; a subsequent valid upload succeeds.
+  Regression: `uv run python -m unittest discover -s tests -v` passed all
+  32 tests; `git diff --check` exited 0.
+  Independent review passed; this chunk is committed as feat: expose cores3 audio capture endpoint (see Git history for its hash).
+- Hardware verification remains pending: no CoreS3 was available to verify
+  the idle tap, Serial acknowledgment, quiet tap, or audible phrase playback.
