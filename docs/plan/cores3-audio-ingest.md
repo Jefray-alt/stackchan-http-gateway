@@ -52,7 +52,7 @@ count, and duration.
   boundaries, early disconnect, invalid size, and idle and total deadlines.
   Return PCM to the caller only after a complete, valid upload.
 - Proposed commit — `feat: validate streamed cores3 pcm`
-- Status — Planned.
+- Status — Implemented; frozen for independent review.
 
 #### T1.2. Save completed PCM as WAV
 
@@ -100,4 +100,10 @@ count, and duration.
 
 ## Completion record
 
-Implementation commits and verification results are pending.
+- T1.1 — Added an internal async PCM receiver with domain validation and
+  deadline errors; disconnects, cancellation, and source failures propagate.
+  RED: `uv run python -m unittest discover -s tests -p test_audio_receiver.py -v`
+  exited 1 before the receiver existed. GREEN: the same command passed all
+  15 focused tests, including size boundaries and deterministic deadline cases.
+  Commit and independent review are pending.
+- T1.2 and T1.3 implementation and end-to-end verification are pending.
