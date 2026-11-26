@@ -79,6 +79,17 @@ count, and duration.
 - Proposed commit — `feat: expose cores3 audio capture endpoint`
 - Status — Complete; independent review passed. Commit subject: feat: expose cores3 audio capture endpoint.
 
+#### T1.4. Group audio ingestion modules
+
+- Outcome — Keep audio receiving and WAV capture code in a dedicated
+  `stackchan_http_gateway.audio` package.
+- Depends on — T1.1, T1.2, and T1.3.
+- Acceptance and checks — Move the receiver and capture writer into the audio
+  package, update production/test imports and patch paths, preserve behavior,
+  and pass focused plus full regression checks.
+- Proposed commit — `refactor: group audio ingestion modules`
+- Status — Complete; independent review passed. Commit subject: refactor: group audio ingestion modules.
+
 ## End-to-end verification
 
 - Send known PCM to a running gateway over a real HTTP/1.1 chunked connection
@@ -129,5 +140,19 @@ count, and duration.
   Regression: `uv run python -m unittest discover -s tests -v` passed all
   32 tests; `git diff --check` exited 0.
   Independent review passed; this chunk is committed as feat: expose cores3 audio capture endpoint (see Git history for its hash).
+- T1.4 — Moved the receiver and WAV writer into `audio/receiver.py` and
+  `audio/capture.py`, added an empty package initializer, and updated active
+  imports and patch targets without changing runtime behavior.
+  RED: `uv run python -m unittest discover -s tests -p 'test_audio*.py' -v`
+  exited 1 after updating test paths and before moving production modules:
+  both test modules failed to import the missing audio package.
+  GREEN: the same command passed all 22 audio tests;
+  `uv run python -m unittest discover -s tests -p 'test_transcriptions*.py' -v`
+  passed all 10 transcription tests. Regression:
+  `uv run python -m unittest discover -s tests -v` passed all 32 tests;
+  `git diff --check` exited 0. No old module paths remain in `src` or `tests`.
+  Independent review passed in round 1, including all 32 regression tests.
+  Commit subject: `refactor: group audio ingestion modules` (see Git history
+  for its hash).
 - Hardware verification remains pending: no CoreS3 was available to verify
   the idle tap, Serial acknowledgment, quiet tap, or audible phrase playback.

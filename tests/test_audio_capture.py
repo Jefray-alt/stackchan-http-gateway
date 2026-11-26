@@ -4,7 +4,7 @@ import wave
 from pathlib import Path
 from unittest.mock import patch
 
-from stackchan_http_gateway.audio_capture import save_pcm_wav
+from stackchan_http_gateway.audio.capture import save_pcm_wav
 
 
 PCM = b"\x01\x00\xff\x7f\x00\x80" * 640
@@ -71,11 +71,11 @@ class AudioCaptureTests(unittest.TestCase):
                 self.assertEqual(recording.readframes(len(PCM) // 2), PCM)
             original_link(source, destination)
 
-        with patch("stackchan_http_gateway.audio_capture.os.link", side_effect=publish):
+        with patch("stackchan_http_gateway.audio.capture.os.link", side_effect=publish):
             save_pcm_wav(PCM, self.directory)
 
     def test_publication_failure_removes_temporary_file(self):
-        with patch("stackchan_http_gateway.audio_capture.os.link", side_effect=OSError("link failed")):
+        with patch("stackchan_http_gateway.audio.capture.os.link", side_effect=OSError("link failed")):
             with self.assertRaisesRegex(OSError, "link failed"):
                 save_pcm_wav(PCM, self.directory)
 
@@ -86,7 +86,7 @@ class AudioCaptureTests(unittest.TestCase):
         existing = self.directory / "existing.wav"
         existing.write_bytes(b"previous recording")
 
-        with patch("stackchan_http_gateway.audio_capture.Path.with_suffix", return_value=existing):
+        with patch("stackchan_http_gateway.audio.capture.Path.with_suffix", return_value=existing):
             with self.assertRaises(FileExistsError):
                 save_pcm_wav(PCM, self.directory)
 

@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 from starlette.requests import ClientDisconnect
 
-from stackchan_http_gateway.audio_capture import save_pcm_wav
-from stackchan_http_gateway.audio_receiver import (
+from stackchan_http_gateway.audio.capture import save_pcm_wav
+from stackchan_http_gateway.audio.receiver import (
     AudioReceiveTimeout,
     InvalidPcm,
     PcmTooLarge,

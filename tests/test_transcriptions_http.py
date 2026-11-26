@@ -21,7 +21,7 @@ class ChunkedHttpTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name) / "captures"
         self.enterContext(patch.dict(os.environ, STACKCHAN_CAPTURE_DIR=str(self.directory)))
-        self.enterContext(patch("stackchan_http_gateway.audio_receiver._BODY_IDLE_SECONDS", 0.3))
+        self.enterContext(patch("stackchan_http_gateway.audio.receiver._BODY_IDLE_SECONDS", 0.3))
         self.app = create_app()
         self.socket = socket.socket()
         self.socket.bind(("127.0.0.1", 0))

@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from starlette.requests import ClientDisconnect
 
-from stackchan_http_gateway.audio_receiver import (
+from stackchan_http_gateway.audio.receiver import (
     AudioReceiveTimeout,
     InvalidPcm,
     PcmTooLarge,
@@ -131,7 +131,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 cancelled.set()
 
-        with patch("stackchan_http_gateway.audio_receiver._BODY_IDLE_SECONDS", 0.01):
+        with patch("stackchan_http_gateway.audio.receiver._BODY_IDLE_SECONDS", 0.01):
             with self.assertRaisesRegex(AudioReceiveTimeout, "idle"):
                 await receive_pcm(body())
 
@@ -142,7 +142,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
             yield MIN_PCM
             await asyncio.Event().wait()
 
-        with patch("stackchan_http_gateway.audio_receiver._TOTAL_BODY_SECONDS", 0.01):
+        with patch("stackchan_http_gateway.audio.receiver._TOTAL_BODY_SECONDS", 0.01):
             with self.assertRaisesRegex(AudioReceiveTimeout, "total"):
                 await receive_pcm(body())
 
