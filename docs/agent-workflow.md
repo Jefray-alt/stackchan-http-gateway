@@ -5,6 +5,13 @@ agents. The main session owns the user relationship and routes code changes to
 `implementer` by default, passing the user requirements and decisions. Product
 planning, exploration, and other non-code requests stay in the main session.
 
+## Choose the plan
+
+For every new work request, the main session first asks whether to create a
+separate plan or add the work to an existing plan. Wait for the user's choice
+before planning or implementation. If the user chooses an existing plan and
+the target is unclear, ask which plan and wait for their answer.
+
 ## Before starting
 
 Before planning the work, starting developer/reviewer workers, or editing files,
@@ -33,10 +40,11 @@ do not apply to edits made during an already-started normal task.
 
 Before editing files or starting developer/reviewer workers, the main session
 publishes an ordered task and commit plan based on the user's request and
-accepted requirements. Use [the plan template](plan/template.md) to describe
-each task's outcome and acceptance criteria and list its commit chunks in
-order. Each chunk names its ID, scope, dependencies, checks, and proposed
-Conventional Commit. Keep the plan focused on the requested work.
+accepted requirements in the chosen plan. For a new plan, start from
+[the plan template](plan/template.md); for an existing plan, update that file
+in place. Describe each task's outcome and acceptance criteria and list its
+commit chunks in order. Each chunk names its ID, scope, dependencies, checks,
+and proposed Conventional Commit. Keep the plan focused on the requested work.
 
 Each implementation plan must focus on one specific outcome. During planning,
 use a rough judgment of total added and deleted lines across all its tasks,

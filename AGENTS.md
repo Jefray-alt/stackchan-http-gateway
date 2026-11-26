@@ -5,17 +5,22 @@
 - `docs/plan/<task>.md`: lightweight requirements, design decisions, and
   ordered implementation tasks for current work.
 
-Start each implementation plan from [the plan template](docs/plan/template.md)
-before implementation begins. Save it under `docs/plan/` with a descriptive,
-lowercase, hyphenated filename. Update the same file as decisions, scope, or
-task status change. Keep detailed requirements in the plan.
+For a new plan, start from [the plan template](docs/plan/template.md) before
+implementation begins. Save it under `docs/plan/` with a descriptive, lowercase,
+hyphenated filename. For an existing plan, update that file in place. Update the
+chosen file as decisions, scope, or task status change. Keep detailed
+requirements in the plan.
 
 ## Workflow
 
-1. Keep planning focused on the requested outcome.
-2. Detail only the current task; defer unrelated work.
-3. Keep plans lightweight and appropriate for a small service.
-4. After completing a product feature, update the project documentation that
+1. For every new work request, the main session first asks whether to create a
+   separate plan or add the work to an existing plan. Wait for the user's choice
+   before planning or implementation. If the user chooses an existing plan and
+   the target is unclear, ask which plan and wait for their answer.
+2. Keep planning focused on the requested outcome.
+3. Detail only the current task; defer unrelated work.
+4. Keep plans lightweight and appropriate for a small service.
+5. After completing a product feature, update the project documentation that
    describes its supported behavior.
 
 For code-change requests, the main session routes implementation to the
