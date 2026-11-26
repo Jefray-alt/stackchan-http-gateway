@@ -90,6 +90,19 @@ count, and duration.
 - Proposed commit — `refactor: group audio ingestion modules`
 - Status — Complete; independent review passed. Commit subject: refactor: group audio ingestion modules.
 
+#### T1.5. Group audio receive errors
+
+- Outcome — Keep audio receive exception types in `audio/errors.py` and make
+  every exception class name end in `Error`.
+- Depends on — T1.4.
+- Acceptance and checks — Move the exception classes into the errors module,
+  update imports and tests to use `InvalidPcmError`, `PcmTooLargeError`, and
+  `AudioReceiveTimeoutError` alongside `AudioReceiveError`, and preserve
+  endpoint error handling. Run focused audio and transcription tests plus the
+  full regression suite.
+- Proposed commit — `refactor: organize audio receive errors`
+- Status — Planned.
+
 ## End-to-end verification
 
 - Send known PCM to a running gateway over a real HTTP/1.1 chunked connection
