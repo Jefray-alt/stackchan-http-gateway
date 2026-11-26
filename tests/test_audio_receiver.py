@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 from starlette.requests import ClientDisconnect
 
-from stackchan_http_gateway.audio.receiver import (
-    AudioReceiveTimeout,
-    InvalidPcm,
-    PcmTooLarge,
-    receive_pcm,
+from stackchan_http_gateway.audio.errors import (
+    AudioReceiveTimeoutError,
+    InvalidPcmError,
+    PcmTooLargeError,
 )
+from stackchan_http_gateway.audio.receiver import receive_pcm
 
 
 MIN_PCM = b"\x01\x00" * 1_920
@@ -55,7 +55,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
     async def test_rejects_empty_short_and_odd_completed_bodies(self):
         for size in (0, 1, 3_838, 3_839, 3_841):
             with self.subTest(size=size):
-                with self.assertRaises(InvalidPcm):
+                with self.assertRaises(InvalidPcmError):
                     await receive_pcm(segments(b"\x00" * size))
 
     async def test_accepts_empty_segments_without_changing_pcm(self):
@@ -71,13 +71,13 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
             read_after_limit = True
             yield b"unread"
 
-        with self.assertRaises(PcmTooLarge):
+        with self.assertRaises(PcmTooLargeError):
             await receive_pcm(body())
 
         self.assertFalse(read_after_limit)
 
     async def test_rejects_an_oversized_first_segment(self):
-        with self.assertRaises(PcmTooLarge):
+        with self.assertRaises(PcmTooLargeError):
             await receive_pcm(segments(b"\x00" * (MAX_PCM_BYTES + 1)))
 
     async def test_disconnect_does_not_return_partial_pcm(self):
@@ -132,7 +132,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
                 cancelled.set()
 
         with patch("stackchan_http_gateway.audio.receiver._BODY_IDLE_SECONDS", 0.01):
-            with self.assertRaisesRegex(AudioReceiveTimeout, "idle"):
+            with self.assertRaisesRegex(AudioReceiveTimeoutError, "idle"):
                 await receive_pcm(body())
 
         self.assertTrue(cancelled.is_set())
@@ -143,7 +143,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.Event().wait()
 
         with patch("stackchan_http_gateway.audio.receiver._TOTAL_BODY_SECONDS", 0.01):
-            with self.assertRaisesRegex(AudioReceiveTimeout, "total"):
+            with self.assertRaisesRegex(AudioReceiveTimeoutError, "total"):
                 await receive_pcm(body())
 
     async def test_idle_deadline_resets_after_each_segment(self):
@@ -169,7 +169,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
 
         loop = asyncio.get_running_loop()
         with patch.object(loop, "time", side_effect=lambda: clock[0]):
-            with self.assertRaisesRegex(AudioReceiveTimeout, "total"):
+            with self.assertRaisesRegex(AudioReceiveTimeoutError, "total"):
                 await receive_pcm(body())
 
     async def test_deadline_applies_to_normal_body_completion(self):
@@ -181,7 +181,7 @@ class AudioReceiverTests(unittest.IsolatedAsyncioTestCase):
 
         loop = asyncio.get_running_loop()
         with patch.object(loop, "time", side_effect=lambda: clock[0]):
-            with self.assertRaisesRegex(AudioReceiveTimeout, "idle"):
+            with self.assertRaisesRegex(AudioReceiveTimeoutError, "idle"):
                 await receive_pcm(body())
 
 

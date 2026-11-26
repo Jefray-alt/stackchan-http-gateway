@@ -5,12 +5,12 @@ from fastapi.responses import Response
 from starlette.requests import ClientDisconnect
 
 from stackchan_http_gateway.audio.capture import save_pcm_wav
-from stackchan_http_gateway.audio.receiver import (
-    AudioReceiveTimeout,
-    InvalidPcm,
-    PcmTooLarge,
-    receive_pcm,
+from stackchan_http_gateway.audio.errors import (
+    AudioReceiveTimeoutError,
+    InvalidPcmError,
+    PcmTooLargeError,
 )
+from stackchan_http_gateway.audio.receiver import receive_pcm
 
 
 router = APIRouter(tags=["transcription"])
@@ -35,11 +35,11 @@ async def capture_audio(request: Request) -> Response:
     try:
         try:
             pcm = await receive_pcm(request.stream())
-        except InvalidPcm as error:
+        except InvalidPcmError as error:
             raise HTTPException(400, str(error)) from error
-        except PcmTooLarge as error:
+        except PcmTooLargeError as error:
             raise HTTPException(413, str(error)) from error
-        except AudioReceiveTimeout as error:
+        except AudioReceiveTimeoutError as error:
             raise HTTPException(408, str(error)) from error
         except ClientDisconnect as error:
             raise HTTPException(400, "Audio upload disconnected") from error

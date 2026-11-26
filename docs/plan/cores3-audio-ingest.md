@@ -101,7 +101,7 @@ count, and duration.
   endpoint error handling. Run focused audio and transcription tests plus the
   full regression suite.
 - Proposed commit — `refactor: organize audio receive errors`
-- Status — Planned.
+- Status — Complete; independent review passed. Commit subject: refactor: organize audio receive errors.
 
 ## End-to-end verification
 
@@ -167,5 +167,20 @@ count, and duration.
   Independent review passed in round 1, including all 32 regression tests.
   Commit subject: `refactor: group audio ingestion modules` (see Git history
   for its hash).
+- T1.5 — Moved all four audio receive exception definitions into
+  `audio/errors.py`; renamed derived classes to `InvalidPcmError`,
+  `PcmTooLargeError`, and `AudioReceiveTimeoutError`. Updated receiver,
+  endpoint, and test imports/references; constants, error messages,
+  inheritance, and HTTP mappings remain unchanged.
+  RED: `uv run python -m unittest discover -s tests -p 'test_audio*.py' -v`
+  exited 1 after updating tests, because `audio.errors` did not exist.
+  GREEN: the same command passed all 22 audio tests;
+  `uv run python -m unittest discover -s tests -p 'test_transcriptions*.py' -v`
+  passed all 10 transcription tests;
+  `uv run python -m unittest discover -s tests -v` passed all 32 tests.
+  `git diff --check` exited 0. No stale exception names or imports from the
+  receiver remain in `src` or `tests`. Independent review passed in round 1,
+  including all 32 regression tests. Commit subject:
+  `refactor: organize audio receive errors` (see Git history for its hash).
 - Hardware verification remains pending: no CoreS3 was available to verify
   the idle tap, Serial acknowledgment, quiet tap, or audible phrase playback.

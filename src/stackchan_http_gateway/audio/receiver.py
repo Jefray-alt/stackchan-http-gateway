@@ -1,27 +1,17 @@
 import asyncio
 from collections.abc import AsyncIterable
 
+from stackchan_http_gateway.audio.errors import (
+    AudioReceiveTimeoutError,
+    InvalidPcmError,
+    PcmTooLargeError,
+)
+
 
 _MIN_PCM_BYTES = 3_840
 _MAX_PCM_BYTES = 1_920_000
 _BODY_IDLE_SECONDS = 5.0
 _TOTAL_BODY_SECONDS = 65.0
-
-
-class AudioReceiveError(Exception):
-    """The PCM body cannot be accepted."""
-
-
-class InvalidPcm(AudioReceiveError):
-    """The completed body is too short or is not sample aligned."""
-
-
-class PcmTooLarge(AudioReceiveError):
-    """The body exceeded the maximum PCM byte count."""
-
-
-class AudioReceiveTimeout(AudioReceiveError):
-    """The body exceeded its idle limit or total deadline."""
 
 
 async def receive_pcm(body: AsyncIterable[bytes]) -> bytes:
@@ -38,7 +28,7 @@ async def receive_pcm(body: AsyncIterable[bytes]) -> bytes:
     while True:
         read_started = loop.time()
         if read_started >= total_deadline:
-            raise AudioReceiveTimeout("PCM upload exceeded the total body deadline")
+            raise AudioReceiveTimeoutError("PCM upload exceeded the total body deadline")
 
         idle_deadline = read_started + _BODY_IDLE_SECONDS
         deadline = min(idle_deadline, total_deadline)
@@ -51,21 +41,21 @@ async def receive_pcm(body: AsyncIterable[bytes]) -> bytes:
         except TimeoutError as error:
             if not timeout.expired():
                 raise
-            raise AudioReceiveTimeout(f"PCM upload exceeded the {reason}") from error
+            raise AudioReceiveTimeoutError(f"PCM upload exceeded the {reason}") from error
 
         # Buffered reads may not yield control for asyncio's timer to fire.
         if loop.time() >= deadline:
-            raise AudioReceiveTimeout(f"PCM upload exceeded the {reason}")
+            raise AudioReceiveTimeoutError(f"PCM upload exceeded the {reason}")
 
         if segment is None:
             break
 
         if len(pcm) + len(segment) > _MAX_PCM_BYTES:
-            raise PcmTooLarge("PCM upload exceeds 1,920,000 bytes")
+            raise PcmTooLargeError("PCM upload exceeds 1,920,000 bytes")
 
         pcm.extend(segment)
 
     if len(pcm) < _MIN_PCM_BYTES or len(pcm) % 2:
-        raise InvalidPcm("PCM upload must contain at least 3,840 bytes and complete samples")
+        raise InvalidPcmError("PCM upload must contain at least 3,840 bytes and complete samples")
 
     return bytes(pcm)
